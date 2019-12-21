@@ -1,6 +1,6 @@
-#MIB - TikTok crawler
+# MIB - TikTok crawler
 
-###Directories description
+### Directories description
 **TestFiles**
 	- files which are in test stage and not complete
 **FinalFiles**
