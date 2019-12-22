@@ -2,8 +2,7 @@
 
 ### Directories description
 
-**TestFiles**
-	- files which are in test stage and not complete
+- **TestFiles** (files which are in test stage and not complete)
 	
-**FinalFiles**
-	- files which are officially ready to use
+- **FinalFiles** (files which are officially ready to use)
+	- **DataCrawler** (files for crawling data)
