@@ -10,8 +10,8 @@ class get_data_user(scrapy.Spider):
             'userName': response.css('h1.share-title::text').extract_first(),
             'userTag': response.css('h1.share-sub-title::text')[0].extract() + response.css('h1.share-sub-title::text')[1].extract(),  # userTag is made out of two elements --> @ and "user tag"
             'userDescription': response.css('h2.share-desc::text').extract_first(),
-            'userImg':  response.css('div.jsx-2177493926::attr(style)').extract_first(),  # TODO parse just background-img link
-            'userVerified': response.css('span.jsx-874583638::text').extract_first(default="Not verified account"),
+            'userImg': response.css('div.jsx-2177493926::attr(style)').extract_first().split('"')[1],  # gets css of tag, then parsed into background-img link
+            'userVerified': response.css('span.jsx-874583638::text').extract_first(default="Not verified account"),  # if tag that says: 'user is verified' is missing, default option is chosen
             'userFollowing': response.css('p.count-infos > span.number::text')[0].extract(),
             'userFollowers': response.css('p.count-infos > span.number::text')[1].extract(),
             'userLikes': response.css('p.count-infos > span.number::text')[2].extract(),
