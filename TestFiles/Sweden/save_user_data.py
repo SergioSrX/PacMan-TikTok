@@ -10,10 +10,18 @@ with open("user_data.txt") as json_file:
     # Making a loop to put in every user into json format
     for p in user:
         userData = {
+            "itemNum" : p["itemNum"],
             "userName": p["userName"],
             "userTag": p["userTag"],
+            "userLink" : p["userLink"],
+            "userDescription" : p["userDescription"],
+            "userRegion" : p["userRegion"],
+            "userImage" : p["userImg"],
+            "userVerified" : p["userVerified"],
             "userFollowing": p["userFollowing"],
-            "userFollowers": p["userFollowers"]
+            "userFollowers": p["userFollowers"],
+            "userLikes" : p["userLikes"],
+            "userVideosCount" : p["userVideosCount"]
         }
         # Putting it in into MongoDB
         result = db.userDatas.insert_one(userData)
