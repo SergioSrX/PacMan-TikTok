@@ -25,5 +25,6 @@ with open("user_data.txt") as json_file:
         }
         # Putting it in into MongoDB
         result = db.userDatas.insert_one(userData)
-        # Just a print to see that everything has been written into the database
-        print("Har skrivit users")
+        # Just a print to see that everything has been put in the database
+        print("Have written users")
+
