@@ -7,4 +7,5 @@ client = MongoClient(uri)
 db = client.userData
 collection = db.userData
 data = pd.DataFrame(list(collection.find()))
+#Print all the users in the database.
 print(data)
