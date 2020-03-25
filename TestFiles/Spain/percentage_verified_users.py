@@ -12,7 +12,7 @@ users_no_verified = collection.count_documents({'userVerified':False})
 total_users_verified = collection.count_documents({'userVerified':True})
 
 # Pie chart, where the slices will be ordered and plotted counter-clockwise:
-labels = 'Percentage of verified users', 'Percentage of NO verified users'
+labels = 'Verified Users', 'NO Verified Users'
 sizes = [total_users_verified, users_no_verified]
 explode = (0, 0.1)
 colors = ['gold', 'lightskyblue']
