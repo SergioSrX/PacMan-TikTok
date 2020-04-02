@@ -25,10 +25,8 @@ class get_data_user(scrapy.Spider):
 
         # getting user profile links and other data from tikrank.com
         jsonDataIn = json.loads(response.text)
-        x = 0
         for item in jsonDataIn['data']['kols']:
-            x += 1
-            yield scrapy.Request(self.userLinkBefore + item['kol_unique_id'], callback=self.get_profile_data, meta={'itemNum': x, 'userLink': self.userLinkBefore + item['kol_unique_id'], 'userRegion': userRegLong})  # getting data from tiktok.com based on received profile links and passing some meta data
+            yield scrapy.Request(self.userLinkBefore + item['kol_unique_id'], callback=self.get_profile_data, meta={'itemNum': item['kol_id'], 'userLink': self.userLinkBefore + item['kol_unique_id'], 'userRegion': userRegLong})  # getting data from tiktok.com based on received profile links and passing some meta data
 
     # Getting user's profile data
     def get_profile_data(self, response):
@@ -51,7 +49,7 @@ class get_data_user(scrapy.Spider):
             uri = 'mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority'
             client = MongoClient(uri)
             db = client.userData
-            db.userData.update_one({'userLink': userInfo['userLink']}, {"$set": userInfo}, True)  # Updates existing or inserts new one
+            db.userData.update_one({'itemNum': userInfo['itemNum']}, {'$set': userInfo}, True)  # Updates existing or inserts new one
         except():
             print("Not able the get info about this user:" + response.meta['userLink'])
 
