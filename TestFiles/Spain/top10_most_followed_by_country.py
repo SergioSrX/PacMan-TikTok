@@ -7,7 +7,7 @@ client = MongoClient(uri)
 db = client.userData
 collection = db.userData
 
-countries = ['Spain','United States','United Kingdom','Germany','Russian Federation','France','India','Japan','Cambodia','Thailand']
+countries = ['Spain','USA','United Kingdom','Germany','Russian Federation','France','India','Japan','Cambodia','Thailand']
 
 for country in countries:
 	top_ten_most_followed = []
