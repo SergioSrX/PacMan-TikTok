@@ -1,14 +1,20 @@
+import json
 import scrapy
 from scrapy.crawler import CrawlerProcess
 from pymongo import MongoClient
-import json
 from time import sleep as pause
 from datetime import datetime as time
+from Naked.toolshed.shell import muterun_js
 
 class get_data_user(scrapy.Spider):
     # Spider setup variables
     name = 'userInfo'
     custom_settings = {'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}  # Modifying crawler's options (USER_AGENT), so crawler doens't behave like a bot and it can get response from page
+
+    # MongoDB setup variables
+    uri = 'mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority'
+    client = MongoClient(uri)
+    db = client.userData
 
     # Setting user links
     start_urls = []
@@ -17,52 +23,98 @@ class get_data_user(scrapy.Spider):
         start_urls.append("https://tikrank.com/influencer/influencers?page_size=100&country={}".format(countries[country]))  # link for getting user link - region (US, IN, empty[world]), count (50 or 100)
     userLinkBefore = "https://www.tiktok.com/@"
 
+    # Method for getting user profile links from Tiktank.com
     def parse(self, response):
-        # getting user region from request url
+        # Getting user region from request url
         userRegShort = response.request.url.split("=")[2]
         for regLong, regShort in self.countries.items():
             if userRegShort == regShort:
                 userRegLong = regLong
                 break
 
-        # getting user profile links and other data from tikrank.com
+        # Loading user profile links and other data from tikrank.com
         jsonDataIn = json.loads(response.text)
         for item in jsonDataIn['data']['kols']:
-            yield scrapy.Request(self.userLinkBefore + item['kol_unique_id'], callback=self.get_profile_data, meta={'itemNum': item['kol_id'], 'userLink': self.userLinkBefore + item['kol_unique_id'], 'userRegion': userRegLong})  # getting data from tiktok.com based on received profile links and passing some meta data
+            # Calling method get_profile_data and passing some meta data
+            yield scrapy.Request(self.userLinkBefore + item['kol_unique_id'], callback=self.get_profile_data, meta={'userLink': self.userLinkBefore + item['kol_unique_id'], 'userRegion': userRegLong})
 
-    # Getting user's profile data
+    # Method for getting user's profile data
     def get_profile_data(self, response):
         pause(0.5)  # 0.5sec pause so we dont get timeouted from Tiktok server
         try:
-            rawUserJsonData = json.loads(response.css('script#__NEXT_DATA__::text')[0].re('.*')[0])['props']['pageProps']['userInfo']
-            userInfo = {'itemNum': response.meta['itemNum'],
-                        'userName': rawUserJsonData['user']['nickname'],
-                        'userTag': rawUserJsonData['user']['uniqueId'],
+            rawUserData = json.loads(response.css('script#__NEXT_DATA__::text')[0].re('.*')[0])['props']['pageProps']['userInfo']
+            userInfo = {'userID': rawUserData['user']['id'],
+                        'userSecUid': rawUserData['user']['secUid'],
+                        'userName': rawUserData['user']['nickname'],
+                        'userTag': rawUserData['user']['uniqueId'],
                         'userLink': response.meta['userLink'],
-                        'userDescription': rawUserJsonData['user']['signature'],
+                        'userDescription': rawUserData['user']['signature'],
                         'userRegion': response.meta['userRegion'],
-                        'userImg': rawUserJsonData['user']['avatarMedium'],
-                        'userVerified': rawUserJsonData['user']['verified'],
+                        'userImg': rawUserData['user']['avatarMedium'],
+                        'userVerified': rawUserData['user']['verified'],
                         }
 
-            # MongoDB setup variables
-            uri = 'mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority'
-            client = MongoClient(uri)
-            db = client.userData
-            db.userData.update_one({'itemNum': userInfo['itemNum']},
+            # Updates existing user data or inserts new one
+            self.db.userData.update_one({'userID': userInfo['userID']},
                                    {'$set': userInfo,
                                    '$push':
                                         {'userStats':
                                              {'datetime': time.utcnow().strftime("%d-%m-%Y %X"),
-                                              'userFollowing': rawUserJsonData['stats']['followingCount'],
-                                              'userFollowers': rawUserJsonData['stats']['followerCount'],
-                                              'userLikes': rawUserJsonData['stats']['heartCount'],
-                                              'userVideosCount': rawUserJsonData['stats']['videoCount']
+                                              'userFollowing': rawUserData['stats']['followingCount'],
+                                              'userFollowers': rawUserData['stats']['followerCount'],
+                                              'userLikes': rawUserData['stats']['heartCount'],
+                                              'userVideosCount': rawUserData['stats']['videoCount']
                                             }
                                         }
-                                    }, True)  # Updates existing or inserts new one
+                                    }, True)
+
+            # Generating user media singature using nodeJS browser.js script. Script is called using Naked lib
+            userMediaLink = "https://m.tiktok.com/api/item_list/?count=30&id=" + userInfo['userID'] + "&type=1&secUid=" + userInfo['userSecUid'] + "&maxCursor=0&minCursor=0&sourceType=8&appId=1233&region=CZ&language=cs&verifyFp="
+            userMediaSignature = muterun_js('D:\\NodeJS\\node_modules\\tiktok-signature\\browser.js', '"' + userMediaLink + '"')   # TODO get correct absolute path to the script
+            if userMediaSignature.exitcode == 0:
+                # Calling method get_media_data and passing some meta data
+                yield scrapy.Request(userMediaLink + "&_signature=" + userMediaSignature.stdout.decode("utf-8"), callback=self.get_media_data, meta={'userID': userInfo['userID']})
         except():
             print("Not able the get info about this user:" + response.meta['userLink'])
+
+    # Method for getting user's media data
+    def get_media_data(self, response):
+        rawUserMediaData = json.loads(response.text)['items']
+        userMediaInfo = []
+        for item in rawUserMediaData:
+            # Error handling if video has no hash tags
+            try:
+                challenges = item['challenges']
+            except KeyError:
+                challenges = []
+
+            userMediaInfo.append({
+                'videoData': {
+                    'videoID': item['id'],
+                    'videoDescription': item['desc'],
+                    'videoDuration': item['video']['duration'],
+                    'videoImg': item['video']['cover'],
+                    'videoLink': item['video']['playAddr']
+                },
+                'musicData': {
+                    'musicID': item['music']['id'],
+                    'musicName': item['music']['title'],
+                    'musicLink': item['music']['playUrl'],
+                    'musicImg': item['music']['coverMedium'],
+                    'musicIsOriginal': item['music']['original']    # If true video is without music and uses original sound
+                },
+                'hashtagsData': challenges,
+                'videoStats': {
+                    'videoLikes': item['stats']['diggCount'],
+                    'videoShares': item['stats']['shareCount'],
+                    'videoComments': item['stats']['commentCount'],
+                    'videoViews': item['stats']['playCount']
+                }
+            })
+
+        # Saving user's media data
+        self.db.userData.update_one({'userID': response.meta['userID']}, {'$set': {'mediaData': userMediaInfo}}, True)
+
 
 # code for runnig spider straight from script and not with CLI
 process = CrawlerProcess(settings={
