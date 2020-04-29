@@ -9,7 +9,7 @@ collection = db.userData
 top_ten_most_followed = []
 
 #Top 10 most followed TikTok users in the database.
-for user in list(collection.find({}, {'_id': False}).sort("userFollowers",pymongo.DESCENDING).limit(10)):
+for user in list(collection.find({}, {'_id': False,'userName':1,"userStats.userFollowers": 1}).sort("userStats.userFollowers",pymongo.DESCENDING).limit(10)):
 	top_ten_most_followed.append(user)
 
 data = pd.DataFrame(top_ten_most_followed,index=None)
