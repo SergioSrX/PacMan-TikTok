@@ -2,7 +2,7 @@ import pymongo
 import pandas as pd
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
-plt.rcParams['figure.figsize'] = [20, 10]
+plt.rcParams['figure.figsize'] = [20, 5] #Set the plot size
 uri = 'mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority'
 client = MongoClient(uri)
 db = client.userData
