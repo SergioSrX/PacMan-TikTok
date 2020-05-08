@@ -2,7 +2,7 @@ import pymongo
 import pandas as pd
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
-
+plt.rcParams['figure.figsize'] = [20, 10]
 uri = 'mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority'
 client = MongoClient(uri)
 db = client.userData
@@ -21,14 +21,14 @@ def autolabel(rects):
                     ha='center', va='bottom')
 
 for country in countries:
-	usersNames = []
+	usersTags = []
 	followers = []
 	#Top 10 most followed TikTok users by country in the database.
-	for user in list(collection.find({'userRegion': country}, {'_id': False,'userName':1,'userStats':1}).sort("userStats.0.userFollowers",pymongo.DESCENDING).limit(10)):
-		usersNames.append(user['userName'])
+	for user in list(collection.find({'userRegion': country}, {'_id': False,'userTag':1,'userStats':1}).sort("userStats.0.userFollowers",pymongo.DESCENDING).limit(10)):
+		usersTags.append(user['userTag'])
 		followers.append(user['userStats'][0]['userFollowers'])
 	#bar graph for each country	
-	bar = plt.bar(usersNames,followers,color='green')
+	bar = plt.bar(usersTags,followers,color='green')
 	autolabel(bar)
 	plt.title("Top 10 most followed from "+country)
 	plt.xlabel("Users")
