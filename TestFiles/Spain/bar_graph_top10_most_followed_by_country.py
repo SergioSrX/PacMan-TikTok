@@ -8,8 +8,8 @@ client = MongoClient(uri)
 db = client.userData
 collection = db.userData
 
-countries = ['Spain','United Kingdom','Germany','Russian Federation','France']
-
+europeanUnionCountries= ['Spain','Germany','France']
+numUserStats = "1"
 def autolabel(rects):
     #Attach a text label above each bar in *rects*, displaying its height.
     for rect in rects:
@@ -20,13 +20,13 @@ def autolabel(rects):
                     textcoords="offset points",
                     ha='center', va='bottom')
 
-for country in countries:
+for country in europeanUnionCountries:
 	usersTags = []
 	followers = []
 	#Top 10 most followed TikTok users by country in the database.
-	for user in list(collection.find({'userRegion': country}, {'_id': False,'userTag':1,'userStats':1}).sort("userStats.0.userFollowers",pymongo.DESCENDING).limit(10)):
+	for user in list(collection.find({'userRegion': country}, {'_id': False,'userTag':1,'userStats':1}).sort("userStats."+numUserStats+".userFollowers",pymongo.DESCENDING).limit(10)):
 		usersTags.append(user['userTag'])
-		followers.append(user['userStats'][0]['userFollowers'])
+		followers.append(user['userStats'][int(numUserStats)]['userFollowers'])
 	#bar graph for each country	
 	bar = plt.bar(usersTags,followers,color='green')
 	autolabel(bar)
