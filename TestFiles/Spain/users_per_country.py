@@ -8,7 +8,7 @@ client = MongoClient(uri)
 db = client.userData
 collection = db.userData
 
-countries = ['Spain','USA','United Kingdom','Germany','Russian Federation','France','India','Japan','Cambodia','Thailand']
+countries = ['Spain','Germany','France']
 users = []
 total_users = collection.count_documents({})
 for country in countries:

@@ -8,7 +8,7 @@ client = MongoClient(uri)
 db = client.userData
 collection = db.userData
 hashtag ="stayathome"
-european_countries = ["Spain", "Germany","United Kingdom","France",'Russian Federation']
+european_countries = ["Spain", "Germany","France"]
 users = []
 #Get the number of users who use a specific hashtag per country
 for country in european_countries:
