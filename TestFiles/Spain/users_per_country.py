@@ -10,7 +10,7 @@ collection = db.userData
 
 countries = ['Spain','Germany','France']
 users = []
-total_users = collection.count_documents({})
+total_users = collection.count_documents({'userRegion': { "$in": countries}})
 for country in countries:
 	users.append(collection.count_documents({'userRegion': country}))
 
@@ -30,5 +30,5 @@ autolabel(bar)
 plt.title("Number of users per country (Total Users: "+ str(total_users)+")")
 plt.xlabel("Countries")
 plt.ylabel("Users")
-plt.ylim(0, 120) 
+plt.ylim(0, 4500)
 plt.show()

@@ -12,8 +12,9 @@ countries = ['Spain','Germany','France']
 for country in countries:
 	top_ten_most_followed = []
 	#Top 10 most followed TikTok users by country in the database.
-	for user in list(collection.find({'userRegion': country}, {'_id': False,'userName':1,'userStats':1,'userRegion':1}).sort("userStats.userFollowers",pymongo.DESCENDING).limit(10)):
+	for user in list(collection.find({'userRegion': country}, {'_id': False,'userTag':1,'userStats':1,'userRegion':1}).sort("userStats.userFollowers",pymongo.DESCENDING).limit(10)):
 		top_ten_most_followed.append(user)
 
 	data = pd.DataFrame(top_ten_most_followed,index=None)
+	print('\n'+country.upper() + ':\n')
 	print(data)

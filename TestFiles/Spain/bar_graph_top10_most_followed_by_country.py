@@ -28,7 +28,7 @@ for country in europeanUnionCountries:
 		usersTags.append(user['userTag'])
 		followers.append(user['userStats'][int(numUserStats)]['userFollowers'])
 	#bar graph for each country	
-	bar = plt.bar(usersTags,followers,color='green')
+	bar = plt.bar(usersTags,followers,color='purple')
 	autolabel(bar)
 	plt.title("Top 10 most followed from "+country)
 	plt.xlabel("Users")
