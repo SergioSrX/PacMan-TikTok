@@ -13,15 +13,14 @@ class get_data_user(scrapy.Spider):
     custom_settings = {'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}  # Modifying crawler's options (USER_AGENT), so crawler doens't behave like a bot and it can get response from page
 
     # MongoDB setup variables
-    uri = 'mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority'
+    uri = 'mongodb+srv://test:test123456@cluster0-yqf6t.mongodb.net/test?retryWrites=true&w=majority'  # mongodb+srv://packman:MIB123456@packman-mib-wil2x.azure.mongodb.net/test?retryWrites=true&w=majority
     client = MongoClient(uri)
     db = client.userData
-
     # Setting user links
     start_urls = []
-    countries = {'Spain':'ES','USA':'US', 'India':'IN', 'Japan':'JP', 'Cambodia':'KH', 'Thailand':'TH', 'United Kingdom':'GB', 'France':'FR', 'Russian Federation':'RU', 'Germany':'DE'}  # Dictionary of countries from which we get TOP 100 users (1000 users)
+    countries = {'Spain':'ES'}  # 'Spain':'ES' ,'USA':'US', 'India':'IN', 'Japan':'JP', 'Cambodia':'KH', 'Thailand':'TH', 'United Kingdom':'GB', 'France':'FR', 'Russian Federation':'RU', 'Germany':'DE' Dictionary of countries from which we get TOP 100 users (1000 users)
     for country in countries:
-        start_urls.append("https://tikrank.com/influencer/influencers?page_size=1&country={}".format(countries[country]))  # link for getting user link - region (US, IN, empty[world]), count (50 or 100)
+        start_urls.append("https://tikrank.com/influencer/influencers?page_size=10&country={}".format(countries[country]))  # link for getting user link - region (US, IN, empty[world]), count (50 or 100)
     userLinkBefore = "https://www.tiktok.com/@"
 
     # Method for getting user profile links from Tiktank.com
@@ -75,7 +74,7 @@ class get_data_user(scrapy.Spider):
 
         # Generating user media singature using nodeJS browser.js script. Script is called using Naked lib
         userMediaLink = "https://m.tiktok.com/api/item_list/?count=30&id=" + userInfo['userID'] + "&type=1&secUid=" + userInfo['userSecUid'] + "&maxCursor=0&minCursor=0&sourceType=8&appId=1233&region=CZ&language=cs&verifyFp="
-        userMediaSignature = muterun_js('D:\\NodeJS\\node_modules\\tiktok-signature\\browser.js', '"' + userMediaLink + '"')   # TODO get correct absolute path to the script
+        userMediaSignature = muterun_js('../../nodeJS/node_modules/tiktok-signature/browser.js', '"' + userMediaLink + '"')     # calling browser.js script
         if userMediaSignature.exitcode == 0:
             # Calling method get_media_data and passing some meta data
             yield scrapy.Request(userMediaLink + "&_signature=" + userMediaSignature.stdout.decode("utf-8"), callback=self.get_media_data, meta={'userID': userInfo['userID']})
