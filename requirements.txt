@@ -1,0 +1,5 @@
+scrapy
+pymongo
+Naked
+pandas
+matplotlib

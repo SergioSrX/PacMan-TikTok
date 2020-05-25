@@ -1,5 +1,6 @@
 from Naked.toolshed.shell import muterun
 
+# function for installing js library
 def download_Tiktok_signature():
     try:
         muterun("npm i tiktok-signature")       # install tiktok-signature
@@ -7,6 +8,7 @@ def download_Tiktok_signature():
     except():
         print("Could not install tiktok-signature")
 
+# function for modifying file in installed js library
 def rewrite_browserJS():
     try:
         # rewrite browser.js -- adding correct User agent
@@ -17,7 +19,7 @@ def rewrite_browserJS():
             file.truncate()
             file.writelines(content)
         print("Crawler is ready to use!")
-    except():
-        print("Could not rewrite browser.js")
+    except FileNotFoundError:
+        print("Not able to find browser.js, is Node.js installed properly?")
 
 download_Tiktok_signature()
