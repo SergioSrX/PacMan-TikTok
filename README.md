@@ -9,6 +9,7 @@
 	<li> <b> Install Node.js and run nodeJS setup script </b> - this is optional, only if you want to obtain data about user's content
 		<ul>
 			<li> Download and install NodeJS from https://nodejs.org/en/
+			<li> Restart your IDE or cmd, depends where from you run scripts 
 			<li> Run setup script located in: Pacman-TikTok/nodeJS/setup-nodeJS.py
 			<li> After message: "Crawler is ready to use!" it is all ready.
 		</ul>
