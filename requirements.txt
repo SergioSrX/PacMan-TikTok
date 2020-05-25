@@ -3,3 +3,4 @@ pymongo
 Naked
 pandas
 matplotlib
+pymongo[srv]
