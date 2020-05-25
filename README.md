@@ -19,7 +19,7 @@
 </ol>
 
 ## About
-	Crawling top TikTok user data from several countries, including data like username, profile image, evolution of followers in time, video content and stats about it and much more. All of the data are stored in non-SQL db (MongoDB). These data are analyzed using matplotlib into graphs.
+Crawling top TikTok user data from several countries, including data like username, profile image, evolution of followers in time, video content and stats about it and much more. All of the data are stored in non-SQL db (MongoDB). These data are analyzed using matplotlib into graphs.
 	
 ### Directories description
 
