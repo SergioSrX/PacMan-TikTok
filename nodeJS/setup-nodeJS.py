@@ -16,7 +16,7 @@ def rewrite_browserJS():
         # rewrite browser.js -- adding correct User agent
         with open("node_modules\\tiktok-signature\\browser.js", "r+") as file:
             content = file.readlines()
-            content[6] = '        const signer = new Signer("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36")\n'
+            content[6] = '        const signer = new Signer("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36")\n'
             file.seek(0)
             file.truncate()
             file.writelines(content)
